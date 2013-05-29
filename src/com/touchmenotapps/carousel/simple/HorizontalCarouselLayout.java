@@ -102,18 +102,18 @@ public class HorizontalCarouselLayout extends ViewGroup {
 	private long mStartTime;
 	/* Final item to reach (for animation from mCurrentItem to mItemToReach) */
 	private int mItemtoReach = 0;
-	
+
 	private CarouselInterface mCallback;
-	
+
 	/**
 	 * 
 	 * @author Arindam Nath
-	 *
+	 * 
 	 */
 	public interface CarouselInterface {
 		public void onItemChangedListener(View v, int position);
 	}
-	
+
 	/* Animation Task */
 	private Runnable animationTask = new Runnable() {
 		public void run() {
@@ -151,39 +151,36 @@ public class HorizontalCarouselLayout extends ViewGroup {
 	};
 
 	/* Detect user gesture */
-	private GestureDetector mGestureDetector = new GestureDetector(mContext,
-			new GestureDetector.SimpleOnGestureListener() {
-				public boolean onFling(MotionEvent e1, MotionEvent e2,
-						float velocityX, float velocityY) {
-					// Intercept gestion only if not animating views
-					if (!mIsAnimating && mAdapter != null) {
-						int dx = (int) (e2.getX() - e1.getX());
-						if ((Math.abs(dx) > mGestureSensitivity)
-								&& (Math.abs(velocityY) < Math.abs(velocityX))) {
-							if (velocityX > 0) {
-								// Top-bottom movement
-								if (mCurrentItem > 0) {
-									mItemtoReach = mCurrentItem - 1;
-									mStartTime = SystemClock.uptimeMillis();
-									mIsAnimating = true;
-									post(animationTask);
-									return true;
-								}
-							} else {
-								// Bottom-Top movement
-								if (mCurrentItem < (mAdapter.getCount() - 1)) {
-									mItemtoReach = mCurrentItem + 1;
-									mStartTime = SystemClock.uptimeMillis();
-									mIsAnimating = true;
-									post(animationTask);
-									return true;
-								}
-							}
+	private GestureDetector mGestureDetector = new GestureDetector(mContext, new GestureDetector.SimpleOnGestureListener() {
+		public boolean onFling(MotionEvent e1, MotionEvent e2, float velocityX, float velocityY) {
+			// Intercept gestion only if not animating views
+			if (!mIsAnimating && mAdapter != null) {
+				int dx = (int) (e2.getX() - e1.getX());
+				if ((Math.abs(dx) > mGestureSensitivity) && (Math.abs(velocityY) < Math.abs(velocityX))) {
+					if (velocityX > 0) {
+						// Top-bottom movement
+						if (mCurrentItem > 0) {
+							mItemtoReach = mCurrentItem - 1;
+							mStartTime = SystemClock.uptimeMillis();
+							mIsAnimating = true;
+							post(animationTask);
+							return true;
+						}
+					} else {
+						// Bottom-Top movement
+						if (mCurrentItem < (mAdapter.getCount() - 1)) {
+							mItemtoReach = mCurrentItem + 1;
+							mStartTime = SystemClock.uptimeMillis();
+							mIsAnimating = true;
+							post(animationTask);
+							return true;
 						}
 					}
-					return false;
 				}
-			});
+			}
+			return false;
+		}
+	});
 
 	// ~--- constructors -------------------------------------------------------
 	public HorizontalCarouselLayout(Context context) {
@@ -212,7 +209,7 @@ public class HorizontalCarouselLayout extends ViewGroup {
 	public void disableTranslate() {
 		mTranslatateEnbabled = false;
 	}
-	
+
 	public void setOnCarouselViewChangedListener(CarouselInterface carouselInterface) {
 		this.mCallback = carouselInterface;
 	}
@@ -241,6 +238,7 @@ public class HorizontalCarouselLayout extends ViewGroup {
 
 	/**
 	 * Set adapter
+	 * 
 	 * @param adapter
 	 */
 	public void setAdapter(BaseAdapter adapter) {
@@ -262,10 +260,14 @@ public class HorizontalCarouselLayout extends ViewGroup {
 					break;
 				}
 				final View v = mAdapter.getView(i, null, this);
-				addView(v);
+				addView(v, i);
+				getChildStaticTransformation(v, new Transformation());
+				v.clearAnimation();
+				v.invalidate();
 			}
 			childrenLayout(0);
-			invalidate();
+			
+//			mCurrentItem = 0;
 		}
 	}
 
@@ -331,10 +333,10 @@ public class HorizontalCarouselLayout extends ViewGroup {
 		}
 	}
 
+	
 	@Override
 	protected LayoutParams generateDefaultLayoutParams() {
-		return new LayoutParams(LayoutParams.MATCH_PARENT,
-				LayoutParams.MATCH_PARENT);
+		return new LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.MATCH_PARENT);
 	}
 
 	@Override
@@ -387,8 +389,7 @@ public class HorizontalCarouselLayout extends ViewGroup {
 			final View child = getChildAt(i);
 			final float offset = mCenterView - i - gap;
 			final int left = (int) (leftCenterView - (mSpaceBetweenViews * offset));
-			child.layout(left, topCenterView, left + mChildrenWidth,
-					topCenterView + mChildrenHeight);
+			child.layout(left, topCenterView, left + mChildrenWidth, topCenterView + mChildrenHeight);
 		}
 	}
 
@@ -417,8 +418,7 @@ public class HorizontalCarouselLayout extends ViewGroup {
 	protected boolean getChildStaticTransformation(View child, Transformation t) {
 		final Camera camera = new Camera();
 		final int leftCenterView = mWidthCenter - mChildrenWidthMiddle;
-		final float offset = (-child.getLeft() + leftCenterView)
-				/ (float) mSpaceBetweenViews;
+		final float offset = (-child.getLeft() + leftCenterView) / (float) mSpaceBetweenViews;
 		if (offset != 0) {
 			final float absOffset = Math.abs(offset);
 			float scale = (float) Math.pow(SCALE_RATIO, absOffset);
@@ -433,7 +433,7 @@ public class HorizontalCarouselLayout extends ViewGroup {
 			// scale from right
 			if (offset > 0) {
 				camera.save();
-				camera.translate(0.0f, 0.0f, (mViewZoomOutFactor*offset));
+				camera.translate(0.0f, ((mViewZoomOutFactor * offset) / 2), (mViewZoomOutFactor * offset));
 				camera.rotateY(mCoverflowRotation);
 				camera.getMatrix(m);
 				camera.restore();
@@ -442,7 +442,7 @@ public class HorizontalCarouselLayout extends ViewGroup {
 				// scale from left
 			} else {
 				camera.save();
-				camera.translate(0.0f, 0.0f, -(mViewZoomOutFactor*offset));
+				camera.translate(0.0f, -((mViewZoomOutFactor * offset) / 2), -(mViewZoomOutFactor * offset));
 				camera.rotateY(-mCoverflowRotation);
 				camera.getMatrix(m);
 				camera.restore();
@@ -458,5 +458,5 @@ public class HorizontalCarouselLayout extends ViewGroup {
 			m.setConcat(m, mMatrix);
 		}
 		return true;
-	}	
+	}
 }

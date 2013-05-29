@@ -2,14 +2,14 @@ package com.example.uitest;
 
 import java.util.ArrayList;
 
-import com.touchmenotapps.carousel.simple.HorizontalCarouselLayout;
-import com.touchmenotapps.carousel.simple.HorizontalCarouselLayout.CarouselInterface;
-import com.touchmenotapps.carousel.simple.HorizontalCarouselStyle;
-
+import android.app.Activity;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Toast;
-import android.app.Activity;
+
+import com.touchmenotapps.carousel.simple.HorizontalCarouselLayout;
+import com.touchmenotapps.carousel.simple.HorizontalCarouselLayout.CarouselInterface;
+import com.touchmenotapps.carousel.simple.HorizontalCarouselStyle;
 
 public class MainActivity extends Activity {
 	

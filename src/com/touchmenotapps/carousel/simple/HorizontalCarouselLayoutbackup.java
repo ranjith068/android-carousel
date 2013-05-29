@@ -263,9 +263,11 @@ public class HorizontalCarouselLayoutbackup extends ViewGroup {
 				}
 				View v = mAdapter.getView(i, null, this);
 //				Log.v("TESTUI", "view: " + v.getId());
+				getChildStaticTransformation(v, new Transformation());
 				addView(v, i);
 				childrenLayout(i);
 				getChildAt(i).invalidate();
+				
 			}
 			post(animationTask);
 //			for (int i = 0; i < getChildCount(); i++) {

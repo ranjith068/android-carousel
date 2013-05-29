@@ -124,7 +124,7 @@ public class HorizontalCarouselStyle {
 			mRotation = 0;
 			mRotationEnabled = false;
 			mTranslate = 50;
-			mCoverflowRotation = 20;
+			mCoverflowRotation = 0;
 			mViewZoomOutFactor = 90.0f;
 			mTranslatateEnbabled = true;
 			break;
